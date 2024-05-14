@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>RegEx finder thingy</title>
 <style>
 	.highlight{
 		background-color: yellow;
+	}
+	.isophrase{
+		
+	}
+	.specific-catch{
+		text-decoration-line: underline;
+	}
+	.catch-types{
+		font-style: italic;
 	}
 </style>
 </head>
@@ -23,11 +31,10 @@
 <input id="auto-exec" type="checkbox" checked> <label for="auto-exec">Automatically check for matches</label>
 <br />
 <button id="man-exec">Execute</button>
-<hr /><br />
+<hr />
 
-<h4 id="matchcount"></h4>
-<br />
-<p id="out"></p>
+<h3 id="matchcount"></h3>
+<p id="out1"></p>
 
 <br /><br /><hr /><br />
 
@@ -39,58 +46,59 @@
 	const auto = document.getElementById('auto-exec');
 	const manu = document.getElementById('man-exec');
 	const matchCount = document.getElementById('matchcount');
-	const oput = document.getElementById('out');
-	const Oput = document.getElementById('out2');
+	const oput1 = document.getElementById('out1');
+	const oput2 = document.getElementById('out2');
 	
 	ftag.value = 'example keyphrase 1|example keyphrase 2|example keyphrase 3';
 	var FINDTAGS = ftag.value;
 	
-	const reg0 = /(?<=\.|\!|\?)\s(?<statement>[^\.\?\!]*omen[^\.\?\!]*(?<find>depend|progress|right)[^\.\?\!]*)/mig;
-	const reg1 = /(?<=\.|\!|\?)\s(?<statement>[^\.\?\!]*(?<find>depend|progress|rights|right to|power)[^\.\?\!]*)/mig;
-	var reg2 = new RegExp("(?<=\\.|\\!|\\?)\\s(?<statement>[^\\.\\?\\!]*(?<find>" + FINDTAGS + ")[^\\.\\?\\!]*)", 'mig');
+	// const reg0 = /(?<=\.|\!|\?)\s(?<statement>[^\.\?\!]*omen[^\.\?\!]*(?<find>depend|progress|right)[^\.\?\!]*)/mig;
+	// const reg1 = /(?<=\.|\!|\?)\s(?<statement>[^\.\?\!]*(?<find>depend|progress|rights|right to|power)[^\.\?\!]*)/mig;
+	var reg2 = buildRegExp(FINDTAGS);
 	
 	function checkerFn(reg, text){
-		oput.innerHTML = '';
-		Oput.innerHTML = text;
+		oput1.innerHTML = '';
+		oput2.innerHTML = text;
 		
 		let i = 0;
 		while ( (match = reg.exec(text)) !== null) {
 			i++;
-			let head = document.createElement('h5');
-			head.appendChild(document.createTextNode('Match ' + i + ' (from ' + match.index + ' to ' + reg.lastIndex + '):'));
-			oput.appendChild(head);
-			// oput.appendChild(document.createElement('br'));
-			oput.appendChild(document.createTextNode(match[0]));
-			oput.appendChild(document.createElement('br'));
-			oput.appendChild(document.createElement('br'));
+			let head = document.createElement('b');
+			head.appendChild(document.createTextNode('Match ' + i + ' (characters ' + match.index + ' to ' + reg.lastIndex + '):'));
+			let matchPrint = printMatch(match);
+			oput1.appendChild(head);
+			oput1.appendChild(document.createElement('br'));
+			oput1.appendChild(matchPrint);
+			oput1.appendChild(document.createElement('br'));
+			oput1.appendChild(document.createElement('br'));
 			
-			Oput.innerHTML = Oput.innerHTML.split(match[0]).join('<span class=\"highlight">' + match[0] + '</span>');
-			// console.log(`Found ${match[0]} start=${match.index} end=${reg.lastIndex}.`,);
+			oput2.innerHTML = oput2.innerHTML.split(match[0]).join('<span class=\"highlight">' + matchPrint.innerHTML + '</span>');
 		}
 		
 		matchCount.innerHTML = 'Matches: ' + i;
 	}
-	function exportMatches(a, t){
-		oput.innerHTML = '';
-		for(let i = 0; i < a.length; i++){
-			let head = document.createElement('h5');
-			head.appendChild(document.createTextNode('Match ' + i + ' (at ' + t.indexOf(a[i]) + '):'));
-			oput.appendChild(head);
-			// oput.appendChild(document.createElement('br'));
-			oput.appendChild(document.createTextNode(a[i]));
-			oput.appendChild(document.createElement('br'));
-			oput.appendChild(document.createElement('br'));
+	function printMatch(m){
+		let text = m[0];
+		text = text.split(m[2]);
+		let i = document.createElement('span');
+		i.classList.add('specific-catch');
+		i.appendChild(document.createTextNode(m[2]));
+		let o = document.createElement('span');
+		o.appendChild(document.createTextNode(text[0]));
+		for(let j = 1; j < text.length; j++){
+			o.appendChild(i);
+			o.appendChild(document.createTextNode(text[j]));
 		}
+		return o;
 	}
-	
 	function update(){
-		reg2 = new RegExp("(?<=\\.|\\!|\\?)\\s(?<statement>[^\\.\\?\\!]*(?<find>" + FINDTAGS + ")[^\\.\\?\\!]*)", 'mig');
+		reg2 = buildRegExp(FINDTAGS);
 		
 		let text = iput.value;
 		FINDTAGS = ftag.value;
 		
-		// oput.innerHTML = '';
-		// Oput.innerHTML = text;
+		// oput1.innerHTML = '';
+		// oput2.innerHTML = text;
 		
 		if(auto.checked){	checkerFn(reg2, text);	}
 		window.requestAnimationFrame(update);
@@ -98,6 +106,10 @@
 	window.requestAnimationFrame(update);
 	
 	manu.onclick = e => checkerFn(reg2, iput.value);
+	
+	function buildRegExp(tag){
+		return new RegExp("(?<=^|(?<=\\.|\\!|\\?)\\s)(?<statement>[^\\.\\?\\!]*(?<find>" + tag + ")[^\\.\\?\\!]*)", 'mig');
+	}
 </script>
 </body>
 </html>
