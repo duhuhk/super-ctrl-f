@@ -28,7 +28,7 @@
 </span>
 
 <br /><br />
-<input id="auto-exec" type="checkbox" checked> <label for="auto-exec">Automatically check for matches</label>
+<input id="auto-exec" type="checkbox"> <label for="auto-exec">Automatically check for matches (caution: this makes the 'Matches' section un-selectable)</label>
 <br />
 <button id="man-exec">Execute</button>
 <hr />
@@ -48,6 +48,12 @@
 	const matchCount = document.getElementById('matchcount');
 	const oput1 = document.getElementById('out1');
 	const oput2 = document.getElementById('out2');
+	
+	var oldRegExpStr = null;
+	var oldTag = null;
+	var oldRegExp = null;
+	
+	var updateLoop = null;
 	
 	ftag.value = 'example keyphrase 1|example keyphrase 2|example keyphrase 3';
 	var FINDTAGS = ftag.value;
@@ -76,6 +82,9 @@
 		}
 		
 		matchCount.innerHTML = 'Matches: ' + i;
+		
+		// updateLoop = window.requestAnimationFrame(update);
+		// update();
 	}
 	function printMatch(m){
 		let text = m[0];
@@ -100,15 +109,29 @@
 		// oput1.innerHTML = '';
 		// oput2.innerHTML = text;
 		
-		if(auto.checked){	checkerFn(reg2, text);	}
-		window.requestAnimationFrame(update);
+		// checkerFn(reg2, text);
+		
+		if(auto.checked){
+			checkerFn(reg2, text);
+		}
+		
+		updateLoop = window.requestAnimationFrame(update);
 	}
-	window.requestAnimationFrame(update);
+	updateLoop = window.requestAnimationFrame(update);
 	
 	manu.onclick = e => checkerFn(reg2, iput.value);
 	
 	function buildRegExp(tag){
-		return new RegExp("(?<=^|(?<=\\.|\\!|\\?)\\s)(?<statement>[^\\.\\?\\!]*(?<find>" + tag + ")[^\\.\\?\\!]*)", 'mig');
+		if(tag == oldTag){
+			return oldRegExp;
+		}
+		console.log('Building RegExp for tag \"', tag, '\"...');
+		regStr = "(?<=^|(?<=\\.|\\!|\\?)\\s)(?<statement>[^\\.\\?\\!]*(?<find>" + tag + ")[^\\.\\?\\!]*)";
+		console.log('New RegExp string: ', regStr);
+		oldRegExpStr = regStr;
+		oldTag = tag;
+		oldRegExp = new RegExp(regStr, 'mig');
+		return oldRegExp;
 	}
 </script>
 </body>
