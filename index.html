@@ -56,7 +56,7 @@
 	var updateLoop = null;
 	
 	ftag.value = 'example keyphrase 1|example keyphrase 2|example keyphrase 3';
-	var FINDTAGS = ftag.value;
+	var FINDTAGS = String.raw`${ftag.value}`;
 	
 	// const reg0 = /(?<=\.|\!|\?)\s(?<statement>[^\.\?\!]*omen[^\.\?\!]*(?<find>depend|progress|right)[^\.\?\!]*)/mig;
 	// const reg1 = /(?<=\.|\!|\?)\s(?<statement>[^\.\?\!]*(?<find>depend|progress|rights|right to|power)[^\.\?\!]*)/mig;
@@ -101,10 +101,20 @@
 		return o;
 	}
 	function update(){
-		reg2 = buildRegExp(FINDTAGS);
+		reg2 = oldRegExp;
+		try{
+			reg2 = buildRegExp(FINDTAGS);
+		}
+		catch(err){
+			
+		}
 		
-		let text = iput.value;
-		FINDTAGS = ftag.value;
+		// let text = (String.raw`${iput.value}`).replace(/\\/gm, '\\\\');
+		let text = String.raw`${iput.value}`;
+		// let text = iput.value;
+		// FINDTAGS = (String.raw`${ftag.value}`).replace(/\\/gm, '\\\\');
+		FINDTAGS = String.raw`${ftag.value}`;
+		// FINDTAGS = ftag.value;
 		
 		// oput1.innerHTML = '';
 		// oput2.innerHTML = text;
